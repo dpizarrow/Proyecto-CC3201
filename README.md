@@ -6,7 +6,7 @@
 
 ### Chosen Data
 
-- The dataset [Beijing Airbnb Data](https://www.kaggle.com/zihanli1/beijing-airbnb-dataclean) was chosen.
+- The [Beijing Airbnb Data](https://www.kaggle.com/zihanli1/beijing-airbnb-dataclean) dataset was chosen.
 
 ### Database Management
 
