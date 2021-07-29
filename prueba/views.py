@@ -63,9 +63,11 @@ def consulta1(request):
         if form.is_valid():
             lat = form.cleaned_data['lat']
             lon = form.cleaned_data['lon']
-            sql_res = consulta1_sql(lat,lon)
+            lat_hol = form.cleaned_data['lat_hol']
+            lon_hol = form.cleaned_data['lon_hol']            
+            sql_res = consulta1_sql(lat,lon,lat_hol,lon_hol)
             if sql_res:
-                res = consulta1_sql(lat,lon)
+                res = consulta1_sql(lat,lon,lat_hol,lon_hol)
             else:
                res = 'Nada'
             return render(request, 'consulta1_form.html', {'consulta1_form': form, 'resultados': res})
@@ -74,9 +76,9 @@ def consulta1(request):
         form = consulta1form()
     return render(request, 'consulta1_form.html', {'consulta1_form': form})
 
-def consulta1_sql(lat,lon):
+def consulta1_sql(lat,lon,lat_hol,lon_hol):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT lis.name,lis.room_type,lis.price, loc.lat,loc.lon FROM listings lis, location loc WHERE (%s <loc.lat) AND  (%s >loc.lat) AND (%s <loc.lon) AND  (%s >loc.lon) AND  loc.listing_id=lis.id ORDER BY price ASC", [float(lat)-0.05,float(lat)+0.05,float(lon)-0.1,float(lon)+0.1])
+        cursor.execute("SELECT lis.name,lis.room_type,lis.price, loc.lat,loc.lon FROM listings lis, location loc WHERE (%s <loc.lat) AND  (%s >loc.lat) AND (%s <loc.lon) AND  (%s >loc.lon) AND  loc.listing_id=lis.id ORDER BY price ASC FETCH FIRST 200 ROWS ONLY", [float(lat)-float(lat_hol)/2,float(lat)+float(lat_hol)/2,float(lon)-float(lon_hol)/2,float(lon)+float(lon_hol)/2])
         results = namedtuplefetchall(cursor)
     return results
 
@@ -93,7 +95,7 @@ def consulta2(request):
                 cons = consulta2_sql(comentario)
                 res = cons
             else:
-                res = 'No existen comentarios que contienen esa palabra'
+                res = 'Nada'
             return render(request, 'consulta2_form.html', {'consulta2_form': form, 'resultados': res})
     # si es GET (o algo diferente) crearemos un formulario en blanco
     else:
@@ -103,7 +105,7 @@ def consulta2(request):
 
 def consulta2_sql(comentario):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT list.id, list.name, list.price, rev.comments FROM listings list, reviews rev WHERE list.id = rev.listing_id AND (rev.comments LIKE '%"+str(comentario)+"')")
+        cursor.execute("SELECT list.name, list.price, rev.comments, loc.lat, loc.lon FROM listings list INNER JOIN reviews rev ON list.id = rev.listing_id INNER JOIN location loc ON list.id = loc.listing_id AND (rev.comments LIKE %s) ORDER BY price ASC FETCH FIRST 200 ROWS ONLY", ['%' + comentario + '%'])
         results = namedtuplefetchall(cursor)
     return results
 
@@ -120,7 +122,7 @@ def consulta3(request):
                 cons = consulta3_sql(mes)
                 res = cons
             else:
-                res = 'Número fuera del rango de meses.'
+                res = 'Nada'
             return render(request, 'consulta3_form.html', {'consulta3_form': form, 'resultados': res})
     # si es GET (o algo diferente) crearemos un formulario en blanco
     else:
