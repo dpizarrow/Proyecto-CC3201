@@ -1,7 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+
+<style>
+    * {
+      font-family: sans-serif;
+    }
+</style>
+
+<h2> Busqueda por palabra clave</h2>
+
+<p> Esta consulta permite encontrar palabras claves en reviews hechas por huéspedes para distintos alojamientos, ordenando los resultados por el precio de estos (EJ: 'very good', 'very bad').</p>
+
 <form action="" method="post">
     {% csrf_token %}
     {{ consulta2_form }}
     <input type="submit" value="Submit" />
 </form>
 
-{{ resultados }}
+{% if resultados != "Nada" and resultados %}
+        <table>
+        <tr>
+        	<th> Nombre </th>
+                <th> Precio US$</th>
+                <th> Comentario </th>
+		<th> Latitud </th>
+		<th> Longitud </th>
+        </tr>
+        {% for fila in resultados %}
+        <tr>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.name }}</span></label> </td>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.price }}</span></label> </td>
+                <td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.comments }}</span></label> </td>
+		<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.lat }}</span></label> </td>
+		<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.lon }}</span></label> </td>
+	</tr> 
+        {% endfor %}
+        </table>
+{% elif resultados == "Nada" %}
+        <p> No hay datos para la palabra solicitada.</p>
+{% endif %}

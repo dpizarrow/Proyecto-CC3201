@@ -1,7 +1,38 @@
+<style>
+*{
+  font-family:sans-serif;
+}
+
+
+table, th, td {
+  border: 1px solid black;
+}    
+</style>
+
+
+
+<p> Esta consulta permite a través de un mes dado (posición númerica), obtener información sobre los precios de los alojamientos para ese mes. </p>
 <form action="" method="post">
     {% csrf_token %}
     {{ consulta3_form }}
     <input type="submit" value="Submit" />
 </form>
 
-{{ resultados }}
+{% if resultados != "Nada" and resultados %}
+        <table>
+        <tr>
+        	<th> Promedio de precios US$</th>
+        	<th> Precio mínimo US$</th>
+                <th> Precio máximo US$</th>
+        </tr>
+        {% for fila in resultados %}
+        <tr>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.promedio }}</span></label> </td>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.min_price }}</span></label> </td>
+                <td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.max_price }}</span></label> </td>
+        </tr> 
+        {% endfor %}
+        </table>
+{% elif resultados == "Nada" %}
+        <p> No hay datos para el mes solicitado.</p>
+{% endif %}

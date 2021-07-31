@@ -1,7 +1,111 @@
+<!DOCTYPE html>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+
+table {
+  width: 100%;
+}	
+</style>
+<p>Esta consulta permite a través de una latitud, longitud, y holgura dada para ambos valores encontrar alojamientos cercanos a esa posición solicitada. Se puede utilizar el mapa ubicado abajo para encontrar la latitud y longitud de un lugar de Beijing. Los resultados son mostrados por orden ascendiente de precio.</p>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Consulta 1.</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQfzlc5-grfIptN_XaMj1kyvZJeiRs4g8"></script>
+    <script type="text/javascript">
+        function initialize() {
+            // Creating map object
+            var map = new google.maps.Map(document.getElementById('map_canvas'), {
+                zoom: 12,
+                center: new google.maps.LatLng(39.9, 116.42),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            // creates a draggable marker to the given coords
+            var vMarker = new google.maps.Marker({
+                position: new google.maps.LatLng(39.9, 116.42),
+                draggable: true
+            });
+
+            // adds a listener to the marker
+            // gets the coords when drag event ends
+            // then updates the input with the new coords
+            google.maps.event.addListener(vMarker, 'dragend', function (evt) {
+                $("#txtLat").val(evt.latLng.lat().toFixed(6));
+                $("#txtLng").val(evt.latLng.lng().toFixed(6));
+
+                map.panTo(evt.latLng);
+            });
+
+            // centers the map on markers coords
+            map.setCenter(vMarker.position);
+
+            // adds the marker on the map
+            vMarker.setMap(map);
+        }
+    </script>
+</head>
+<body onload="initialize();">
+    <h2>
+        Encontrar coordenadas de latitud y longitud moviendo el pin rojo.
+    </h2>
+
+    <label for="latitude">
+        Latitude:
+    </label>
+    <input id="txtLat" type="text" style="color:red" value="39" />
+    <label for="longitude">
+        Longitude:
+    </label>
+    <input id="txtLng" type="text" style="color:red" value="116" /><br />
+    <br />
+    <br />
+    <div id="map_canvas" style="width: auto; height: 500px;">
+    </div>
+
+</body>
+</html>
+
+
+<p>Los límites para latitud son [39.45,40.94] y para longitud son [115.47,117.49], como recomendación 0.01º equivale a 1 km. aprox.</p>
+
+
+
 <form action="" method="post">
     {% csrf_token %}
     {{ consulta1_form }}
     <input type="submit" value="Submit" />
 </form>
 
-{{ resultados }}
+<style>
+    * {
+      font-family: sans-serif;
+    }
+</style>
+{% if resultados != "Nada" and resultados %}
+        <table>
+        <tr>
+        	<th> Nombre </th>
+        	<th> Tipo </th>
+                <th> Precio US$</th>
+                <th> Latitud </th>
+                <th> Longitud </th>
+        </tr>
+        {% for fila in resultados %}
+        <tr>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.name }}</span></label> </td>
+        	<td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.room_type }}</span></label> </td>
+                <td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.price }}</span></label> </td>
+                <td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.lat }}</span></label> </td>
+                <td> <label for="{{ fila.id }}"> <span class="complete-">{{ fila.lon }}</span></label> </td>
+	</tr> 
+        {% endfor %}
+        </table>
+{% elif resultados == "Nada" %}
+		<p> No hay datos para la locacion solicitada.</p>
+{% endif %}
