@@ -1,9 +1,10 @@
 body {
-	  background-color: gray;
-  }
-  h1 {
-	      color: blue;
-      }
-      p {
-	          color: green;
-	  }
+  background-color: white;
+  font-family: sans-serif;
+}
+h1 {
+    color: blue;
+}
+p {
+    color: green;
+}
